@@ -1,0 +1,214 @@
+3)	Write a smart contract on a test network for Bank account of a customer for following operations: 
+a.	Deposit Money 
+b.	Show Balance
+
+
+ 
+// SPDX-License-Identifier: MIT 
+pragma solidity >=0.7.0 <0.9.0;  
+ 
+contract Bank { 
+ 
+        address public owner;  
+ 
+        mapping(address =>uint256) private userbalance; 
+         
+        constructor() { 
+            owner = msg.sender; 
+        } 
+ 
+        modifier onlyOwner(){ 
+            require (msg.sender==owner, 'You are not the owner of this contract'); 
+        _; 
+        } 
+ 
+        function deposit() public payable returns(bool) { 
+            require(msg.value >10 wei, 'Please deposit at least 10 wei'); 
+            userbalance[msg.sender] +=msg.value; 
+            return true; 
+        } 
+ 
+        function withdraw(uint256 _amount) public payable returns (bool) { 
+            require(_amount <=userbalance[msg.sender], 'You dont have sufficient funds'); 
+            userbalance[msg.sender] -=_amount;  
+            payable(msg.sender).transfer(_amount); 
+            return true; 
+        } 
+ 
+        function getbalance() public view returns(uint256){ 
+            return userbalance[msg.sender]; 
+        } 
+ 
+        function getBankBalance() public view onlyOwner returns(uint256){ 
+            return address(this).balance; 
+        } 
+ 
+        function withdrawBankBalance (uint256 _amount) public payable onlyOwner returns (bool){ 
+             payable(owner).transfer (_amount); 
+        return true; 
+        } 
+ 
+}
+
+
+4)	Write a  program in solidity to create Student data. Use the following constructs: 
+a.	Structures 
+b.	 Arrays 
+
+
+// SPDX-License-Identifier: MIT 
+pragma solidity >=0.7.0 <0.9.0;  
+ 
+contract StudentData{ 
+ 
+    struct Student{ 
+        int rollNo; 
+        string fName; 
+        string lName; 
+        int marks; 
+    } 
+ 
+    address owner; 
+    int public stdCount =0; 
+    mapping(int => Student) public stdRecords; 
+ 
+    modifier onlyOwner{ 
+        require (owner == msg.sender); 
+        _; 
+    } 
+ 
+    constructor(){ 
+ 
+        owner=msg.sender; 
+    } 
+    function addNewRecords (int _rollNo, string memory _fName, string memory _lName, int _marks) public onlyOwner{  
+        stdCount=stdCount+1; 
+
+ 
+   stdRecords [stdCount]=Student (_rollNo,_fName,_lName,_marks); 
+    } 
+    function bonusMarks(int _bonus) public onlyOwner{ 
+        stdRecords[stdCount].marks=stdRecords[stdCount].marks + _bonus; 
+    } 
+    fallback () external payable{ 
+    } 
+    } 
+
+6)	Present a case study on any one Blockchain application. 
+
+// SPDX-License-Identifier: MIT 
+pragma solidity >= 0.7.0 <0.8.0; 
+ 
+contract Ballot { 
+    // VARIBLES 
+    struct vote { 
+        address voterAddresss; 
+        bool choice; 
+    } 
+    struct voter { 
+        string voterName; 
+        bool voted; 
+    } 
+    uint private countResult = 0; 
+    uint public finalResult = 0; 
+    uint public totalVoter = 0; 
+    uint public totalVote = 0; 
+ 
+    address public ballotOfficialAddress; 
+    string public ballotOfficalName; 
+    string public proposal; 
+ 
+    mapping(uint => vote) private votes; 
+    mapping(address => voter) public voterRegister; 
+ 
+    enum State { Created, Voting, Ended } 
+    State public state; 
+
+ 
+ 
+    // MODIFIER 
+    modifier condition(bool _condition) { 
+        require(_condition); 
+        _; 
+    } 
+ 
+    modifier onlyOfficial() { 
+        require(msg.sender == ballotOfficialAddress); 
+        _; 
+    } 
+ 
+    modifier inState(State _state) { 
+        require(state == _state); 
+        _; 
+    } 
+ 
+ 
+    // FUNCTION 
+    constructor( 
+        string memory _ballotofficalName, 
+        string memory _proposal 
+    )  { 
+        ballotOfficialAddress = msg.sender; 
+        ballotOfficalName = _ballotofficalName; 
+        proposal = _proposal; 
+        state = State.Created; 
+    } 
+ 
+     
+    function addVoter( 
+        address _voterAdress, 
+        string memory _voterName 
+    ) public 
+        inState(State.Created) 
+        onlyOfficial     
+    { 
+        voter memory v; 
+        v.voterName = _voterName; 
+        v.voted = false; 
+        voterRegister[_voterAdress] = v; 
+        totalVoter++; 
+    } 
+ 
+ 
+    function startVote()  
+        public  
+        inState(State.Created)  
+        onlyOfficial  
+    { 
+        state = State.Voting; 
+    } 
+ 
+ 
+ 
+    function doVote(bool _choice) 
+        public 
+        inState(State.Voting) 
+        returns (bool voted)  
+    { 
+        bool isFound = false; 
+        if(bytes(voterRegister[msg.sender].voterName).length != 0  
+            && voterRegister[msg.sender].voted == false )  
+        { 
+            voterRegister[msg.sender].voted = true; 
+            vote memory v; 
+            v.voterAddresss = msg.sender; 
+            v.choice = _choice; 
+            if(_choice) { 
+                countResult++; 
+            } 
+            votes[totalVote] = v; 
+            totalVote++; 
+            isFound = true; 
+        } 
+        return isFound; 
+    } 
+    function endVote()  
+        public 
+        inState(State.Voting) 
+        onlyOfficial 
+    { 
+        state = State.Ended; 
+        finalResult = countResult; 
+    } 
+ 
+}
