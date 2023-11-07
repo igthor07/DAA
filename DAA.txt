@@ -1,0 +1,235 @@
+#Factorial Iterative Approach
+
+def fact(n):
+    ans=1
+    for i in range(1,n+1):
+        ans=ans*i
+    return ans
+
+ans=fact(4)
+print(ans)
+
+# Iterative Approach
+
+def fact(n):
+    if n==0:
+        return 1
+    return n*fact(n-1)
+
+ans=fact(4)
+print(ans)
+-------------------------------------------------------------------
+# Fibonacci Step Count
+
+def fibonacci(n):
+    if n <= 0:
+        return 0
+    elif n == 1:
+        return 1
+    else:
+        a, b = 0, 1
+        step_count = 1
+        for _ in range(2, n + 1):
+            step_count += 1
+            a, b = b, a + b
+        return b, step_count
+
+n = int(input("Enter the value of n: "))
+result, steps = fibonacci(n)
+print(f"The {n}-th Fibonacci number is: {result}")
+print(f"Number of steps taken to calculate: {steps}")
+
+--------------------------------------------------------------------------
+
+#Write a program to calculate GCD of Given Two Numbers.
+
+def calculate_gcd(a, b):
+    while b:
+        a, b = b, a % b
+    return a
+
+# Input
+num1 = int(input("Enter the first number: "))
+num2 = int(input("Enter the second number: "))
+
+# Calculate GCD
+gcd = calculate_gcd(num1, num2)
+
+# Output
+print(f"The GCD of {num1} and {num2} is {gcd}")
+
+-------------------------------------------------------------------------------
+def knapSack(W, wt, val, n): 
+
+    if n == 0 or W == 0: 
+        return 0
+   
+    if (wt[n-1] > W): 
+        return knapSack(W, wt, val, n-1) 
+  
+    else: 
+        return max( 
+            val[n-1] + knapSack( 
+                W-wt[n-1], wt, val, n-1), 
+            knapSack(W, wt, val, n-1)) 
+  
+if __name__ == '__main__': 
+    profit = [60, 100, 120] 
+    weight = [10, 20, 30] 
+    W = 50
+    n = len(profit) 
+    print (knapSack(W, weight, profit, n)) 
+
+-----------------------------------------------------------------------------------
+# Merge Sort
+
+def mergeSort(arr):
+    if(len(arr)>1):
+        mid=len(arr)//2
+
+        left_half=arr[:mid]
+        right_half=arr[mid:]
+
+        mergeSort(left_half)
+        mergeSort(right_half)
+
+        i=j=k=0
+
+        while i<len(left_half) and j<len(right_half):
+            if (left_half[i]<right_half[j]):
+                arr[k]=left_half[i]
+                i+=1
+            else:
+                arr[k]=right_half[j]
+                j+=1
+            k+=1
+        
+        while i<len(left_half):
+            arr[k]=left_half[i]
+            k+=1
+            i+=1
+        while j<len(right_half):
+            arr[k]=right_half[j]
+            j+=1
+            k+=1
+
+arr=[53,34,2,56,43,98,21]
+mergeSort(arr)
+print(arr)
+
+
+---------------------------------------------------------------------------------------------
+#Quick Sort
+
+def quickSort(arr):
+    if(len(arr)<=1):
+        return arr
+    
+    pivot=arr[len(arr)//2]
+    left=[x for x in arr if x<pivot]
+    middle=[x for x in arr if x==pivot]
+    right=[x for x in arr if x>pivot]
+
+    return quickSort(left) + middle + quickSort(right)
+
+arr=[98,45,46,67,95,34 ,34]
+
+ans=quickSort(arr)
+print(ans)
+
+--------------------------------------------------------------------------------------------
+# Tower Of Hanoi
+
+def TowerofHanoi(n,from_rod,to_rod,aux_rod):
+    if n==0:
+        return
+    TowerofHanoi(n-1,from_rod,aux_rod,to_rod)
+    print("Moved disk",n,"From Rod",from_rod,"To Rod",to_rod)
+    TowerofHanoi(n-1,aux_rod,to_rod,from_rod)
+
+n=3
+TowerofHanoi(3,"A","C","B")
+
+----------------------------------------------------------------------------------------------
+#Travelling Sales Man Problem
+
+
+def backtrack(graph, path, visited, curr, cost):
+    n = len(graph)
+    global min_cost
+    if len(path) == n:
+        min_cost = min(min_cost, cost + graph[curr][path[0]])
+        return
+
+    for next_city in range(n):
+        if not visited[next_city] and graph[curr][next_city] != 0:
+            visited[next_city] = True
+            path.append(next_city)
+            backtrack(graph, path, visited, next_city, cost + graph[curr][next_city])
+            visited[next_city] = False
+            path.pop()
+
+def tsp_backtracking(graph, start):
+    n = len(graph)
+    visited = [False] * n
+    path = [start]
+
+    visited[start] = True
+    backtrack(graph, path, visited, start, 0)
+    
+    return min_cost
+
+global min_cost 
+min_cost = float('inf')
+graph = [
+    [0, 29, 20, 21],
+    [29, 0, 15, 18],
+    [20, 15, 0, 26],
+    [21, 18, 26, 0]
+]
+start_city = 0
+
+min_cost = tsp_backtracking(graph, start_city)
+print(f"\nMinimum cost for TSP: {min_cost}\n")
+-----------------------------------------------------------------------------------------------
+# Write a program to solve a 0-1 Knapsack problem using dynamic #programming or branch and bound strategy. 
+def knapsack(items, capacity):
+    n = len(items)
+    dp = [[0 for _ in range(capacity + 1)] for _ in range(n + 1)]
+
+    for i in range(n + 1):
+        for w in range(capacity + 1):
+            if i == 0 or w == 0:
+                dp[i][w] = 0
+            elif items[i - 1][0] <= w:
+                dp[i][w] = max(
+                    items[i - 1][1] + dp[i - 1][w - items[i - 1][0]],
+                    dp[i - 1][w]
+                )
+            else:
+                dp[i][w] = dp[i - 1][w]
+
+    # Reconstruct the selected items
+    selected_items = []
+    i, w = n, capacity
+    while i > 0 and w > 0:
+        if dp[i][w] != dp[i - 1][w]:
+            selected_items.append(items[i - 1])
+            i -= 1
+            w -= items[i][0]
+        else:
+            i -= 1
+
+    return dp[n][capacity], selected_items
+
+# Example usage
+items = [(2, 10), (3, 15), (5, 40), (7, 60)]
+capacity = 10
+
+max_value, selected_items = knapsack(items, capacity)
+
+print("Maximum Value:", max_value)
+print("Selected Items:")
+for item in selected_items:
+    print("Weight:", item[0], "Value:", item[1])
+
